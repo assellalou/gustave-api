@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// user
+// auth
 Route::group([
 
     'middleware' => 'api',
@@ -18,6 +18,22 @@ Route::group([
     Route::post('me', 'AuthController@me');
 });
 
+// student
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'student'
+], function ($router) {
+    Route::get('dashboard', 'StudentController@student');
+}); 
+
+// teahcers
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'teacher',
+], function ($router) {
+    Route::get('dashboard', 'TeacherController@teacher')->middleware('teacher');
+});
+
 // admin
 Route::group([
     'middleware' => 'api',
@@ -25,5 +41,3 @@ Route::group([
 ], function ($router) {
     Route::get('dashboard', 'AdminController@admin')->middleware('admin');
 });
-
-//students
