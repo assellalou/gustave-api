@@ -11,7 +11,7 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('register', 'AuthController@register');
+    Route::post('register', 'AuthController@register'); //TODO delete this on production
     Route::post('login', 'AuthController@login');
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
@@ -37,8 +37,8 @@ Route::group([
     Route::get('courses', 'TeacherController@allMyCourses')->middleware('teacher');
 
     Route::post('course/new', 'TeacherController@newCourse');
-    Route::post('course/edit/{id}', 'TeacherController@editCourse');
-    Route::post('course/delete/{id}', 'TeacherController@deleteCourse');
+    Route::post('course/edit/{course}', 'TeacherController@editCourse');
+    Route::post('course/delete/{course}', 'TeacherController@deleteCourse');
 });
 
 //admin

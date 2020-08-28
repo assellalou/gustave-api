@@ -27,27 +27,35 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|between:4,100',
+                'email' => 'required|email|unique:users|max:50',
+                'phone' => 'sometimes|digits:10',
+                'username' => 'required|string|unique:users|between:4,50',
+                'password' => 'required|confirmed|string|min:6',
+                'adresse' => 'sometimes|string|max:100',
+                'city' => 'sometimes|string|max:25',
+                'classe' => 'sometimes|integer|exists:classes,id'
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|between:2,100',
-            'email' => 'required|email|unique:users|max:50',
-            'username' => 'required|string|unique:users|between:4,50',
-            'password' => 'required|confirmed|string|min:6',
-        ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            $user = User::create(array_merge(
+                $validator->validated(),
+                ['password' => bcrypt($request->password)]
+            ));
+
+            return response()->json([
+                'message' => 'Successfully registered',
+                'user' => $user
+            ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Something went wrong'], 500);
         }
-
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password' => bcrypt($request->password)]
-        ));
-
-        return response()->json([
-            'message' => 'Successfully registered',
-            'user' => $user
-        ], 201);
     }
 
     /**
@@ -59,16 +67,21 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        if (isset($request['username']) && $request['username'] != null)
-            $credentials = $request->only('username', 'password');
-        else
-            $credentials = $request->only('email', 'password');
+        try {
+            if (isset($request['username']) && $request['username'] != null)
+                $credentials = $request->only('username', 'password');
+            else
+                $credentials = $request->only('email', 'password');
 
-        if ($token = $this->guard()->attempt($credentials)) {
-            return $this->respondWithToken($token);
+            if ($token = $this->guard()->attempt($credentials)) {
+                return $this->respondWithToken($token);
+            }
+
+            return response()->json(['error' => 'Unauthorized'], 401);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Something went wrong'], 500);
         }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**
@@ -78,7 +91,12 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json($this->guard()->user());
+        try {
+            return response()->json($this->guard()->user());
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 
     /**
@@ -88,9 +106,14 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        $this->guard()->logout();
+        try {
+            $this->guard()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 
     /**
@@ -100,7 +123,12 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken($this->guard()->refresh());
+        try {
+            return $this->respondWithToken($this->guard()->refresh());
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 
     /**

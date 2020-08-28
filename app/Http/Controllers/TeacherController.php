@@ -43,7 +43,6 @@ class TeacherController extends Controller
                 return response()->json($validator->errors(), 422);
             }
 
-
             $course = Course::create(array_merge(
                 $validator->validated(),
                 ['teacher' => (Auth::guard()->user()->id)]
@@ -55,6 +54,50 @@ class TeacherController extends Controller
             ], 201);
         } catch (\Throwable $th) {
             // throw $th;
+            return response()->json([
+                'error' => 'something went wrong!',
+            ]);
+        }
+    }
+
+    public function editCourse(Course $course, Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|string|between:4,100',
+                'link' => 'sometimes|url|max:100',
+                'chapter' => 'sometimes|string|max:50',
+                'subject' => 'sometimes|integer|exists:subjects,id',
+                'start_time' => 'sometimes|date:YYYY-MM-DD HH:MM:SS',
+                'end_time' => 'sometimes|date:YYYY-MM-DD HH:MM:SS|after:start_time',
+                'classe' => 'sometimes|integer|exists:classes,id'
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+            $course->update($validator->validated());
+
+            return response()->json([
+                'message' => 'Updated the course Successfully',
+                'course' => $course
+            ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json([
+                'error' => 'something went wrong!',
+            ]);
+        }
+    }
+
+    public function deleteCourse(Course $course)
+    {
+        try {
+            $course->delete();
+            return response()->json([
+                'message' => 'deleted the course Successfully',
+            ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
             return response()->json([
                 'error' => 'something went wrong!',
             ]);
