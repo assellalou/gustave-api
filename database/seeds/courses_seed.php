@@ -19,7 +19,7 @@ class courses_seed extends Seeder
             'chapter' => Str::random(20),
             'link' => 'http://' . Str::random(10) . '.com/' . Str::random(20),
             'teacher' => 1,
-            'classe_id' => 1
+            'classe' => 1
         ]);
 
         DB::table('courses')->insert([
@@ -28,7 +28,7 @@ class courses_seed extends Seeder
             'chapter' => Str::random(20),
             'link' => 'http://' . Str::random(10) . '.com/' . Str::random(20),
             'teacher' => 1,
-            'classe_id' => 1
+            'classe' => 1
         ]);
 
         DB::table('courses')->insert([
@@ -37,7 +37,7 @@ class courses_seed extends Seeder
             'chapter' => Str::random(20),
             'link' => 'http://' . Str::random(10) . '.com/' . Str::random(20),
             'teacher' => 1,
-            'classe_id' => 3
+            'classe' => 3
         ]);
     }
 }

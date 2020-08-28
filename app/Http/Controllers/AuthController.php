@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -27,7 +28,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|between:2,100',
             'email' => 'required|email|unique:users|max:50',
             'username' => 'required|string|unique:users|between:4,50',
@@ -126,5 +127,74 @@ class AuthController extends Controller
     public function guard()
     {
         return Auth::guard();
+    }
+
+    /**
+     * Edit User Profile
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return illuminate\Http\JsonResponse
+     */
+    public function editProfile(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|between:4,100',
+                'email' => 'sometimes|email|unique:users|max:50',
+                'phone' => 'sometimes|digits:10',
+                'adresse' => 'sometimes|string|max:100',
+                'city' => 'sometimes|string|max:25',
+                'classe' => 'sometimes|integer|exists:classes,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            $id = User::where('id', $this->guard()->user()->id)->update($validator->validated());
+            $user = User::where('id', $id)->get();
+            return response()->json([
+                'message' => 'Successfully updated',
+                'user' => $user
+            ], 201);
+            return response()->json($this->guard()->user());
+        } catch (\Throwable $th) {
+            // throw $th;
+            return response()->json([
+                'error' => 'Something went wrong!',
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset User's password
+     *
+     * @param illuminate\Http\Request $request
+     *
+     * @return illuminate\Http\JsonResponse
+     */
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'password' => 'required|confirmed|string|min:6'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            User::where('id', $this->guard()->user()->id)->update(
+                ['password' => bcrypt($request->password)]
+            );
+
+            return $this->respondWithToken($this->guard()->refresh());
+        } catch (\Throwable $th) {
+            // throw $th;
+            return response()->json([
+                'error' => 'Something went wrong!',
+            ], 500);
+        }
     }
 }
