@@ -17,10 +17,15 @@ class Teacher
      */
     public function handle($request, Closure $next)
     {
-        if ($this->guard()->user()->is_teacher == 1) {
-            return $next($request);
+        try {
+            if ($this->guard()->user()->is_teacher == 1) {
+                return $next($request);
+            }
+            return response()->json(['error' => 'Unauthorized'], 401);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
-        return response()->json(['error' => 'Unauthorized'], 401);
     }
     public function guard()
     {

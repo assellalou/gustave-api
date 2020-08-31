@@ -31,10 +31,10 @@ Route::group([
 
 // teahcers
 Route::group([
-    'middleware' => 'api',
+    'middleware' => ['api', 'teacher'],
     'prefix' => 'teacher',
 ], function ($router) {
-    Route::get('courses', 'TeacherController@allMyCourses')->middleware('teacher');
+    Route::get('courses', 'TeacherController@allMyCourses');
 
     Route::post('course/new', 'TeacherController@newCourse');
     Route::post('course/edit/{course}', 'TeacherController@editCourse');
@@ -43,15 +43,15 @@ Route::group([
 
 //admin
 Route::group([
-    'middleware' => 'api',
+    'middleware' => ['api', 'admin'],
     'prefix' => 'admin'
 ], function ($router) {
     //dashboard
-    Route::get('dashboard', 'AdminController@admin')->middleware('admin');
+    Route::get('dashboard', 'AdminController@admin');
     //lists
     Route::get('classes', 'AdminController@listClasses');
     Route::get('students', 'AdminController@listStudents');
-    Route::get('teachers', 'AdminController@listTachers');
+    Route::get('teachers', 'AdminController@listTeachers');
     Route::get('courses', 'AdminController@listCourses');
     // Route::get('teacher/{:id}')
     //add
