@@ -53,10 +53,8 @@ Route::group([
     Route::get('students', 'AdminController@listStudents');
     Route::get('teachers', 'AdminController@listTeachers');
     Route::get('courses', 'AdminController@listCourses');
-    // Route::get('teacher/{:id}')
     //add
-    Route::post('student/new', 'AdminController@addStudent');
-    Route::post('teacher/new', 'AdminController@addteacher');
+    Route::post('user/new', 'AdminController@addUser');
     Route::post('classe/new', 'AdminController@addClasse');
     Route::post('subject/new', 'AdminController@addSubject');
 });
