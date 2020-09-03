@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Classe;
 use App\Course;
+use App\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,11 @@ class TeacherController extends Controller
     {
         try {
             $courses = DB::table('courses')->where('teacher', Auth::guard()->user()->id)->get();
+            foreach ($courses as $course) {
+                $course->teacher = Auth::guard()->user()->name;
+                $course->subject = Subject::select('name')->where('id', $course->subject)->get()[0]->name;
+                $course->classe = Classe::select('nomination')->where('id', $course->classe)->get()[0]->nomination;
+            }
             return response()->json(['courses' => $courses], 200);
         } catch (\Throwable $th) {
             // throw $th;
