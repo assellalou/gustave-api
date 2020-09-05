@@ -53,6 +53,7 @@ Route::group([
     Route::get('students', 'AdminController@listStudents');
     Route::get('teachers', 'AdminController@listTeachers');
     Route::get('courses', 'AdminController@listCourses');
+    Route::get('subjects', 'AdminController@listSubjects');
     //add
     Route::post('user/new', 'AdminController@addUser');
     Route::post('classe/new', 'AdminController@addClasse');

@@ -30,7 +30,7 @@ class AdminController extends Controller
     public function listStudents()
     {
         try {
-            $students = User::where('is_admin', false)
+            $students = User::orderBy('name', 'ASC')->where('is_admin', false)
                 ->where('is_teacher', false)
                 ->get();
             return response()->json(['students' => $students]);
@@ -54,8 +54,24 @@ class AdminController extends Controller
     public function listCourses()
     {
         try {
-            $courses = Course::all()->groupBy('classe');
+            $courses = Course::orderBy('classe', 'ASC')->get();
+            foreach ($courses as $course) {
+                $course->subject = Subject::select('name')->where('id', $course->subject)->get()[0]->name;
+                $course->teacher = User::select('name')->where('id', $course->teacher)->get()[0]->name;
+                $course->classe = Classe::select('nomination')->where('id', $course->classe)->get()[0]->nomination;
+            }
             return response()->json(['courses' => $courses]);
+        } catch (\Throwable $th) {
+            // throw $th;
+            return response()->json(['error' => 'something went wrong!'], 500);
+        }
+    }
+
+    public function listSubjects()
+    {
+        try {
+            $subjects = Subject::all();
+            return response()->json(['subjects' => $subjects]);
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['error' => 'something went wrong!'], 500);
