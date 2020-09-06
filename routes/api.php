@@ -59,3 +59,5 @@ Route::group([
     Route::post('classe/new', 'AdminController@addClasse');
     Route::post('subject/new', 'AdminController@addSubject');
 });
+
+Route::get('test', 'AdminController@test');

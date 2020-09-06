@@ -33,6 +33,11 @@ class AdminController extends Controller
             $students = User::orderBy('name', 'ASC')->where('is_admin', false)
                 ->where('is_teacher', false)
                 ->get();
+            foreach ($students as $student) {
+                if ($student->classe) {
+                    $student->classe = Classe::select('nomination')->where('id', $student->classe)->get()[0]->nomination;
+                }
+            }
             return response()->json(['students' => $students]);
         } catch (\Throwable $th) {
             // throw $th;
@@ -78,6 +83,17 @@ class AdminController extends Controller
         }
     }
 
+    // public function addUserData()
+    // {
+    //     try {
+    //         $classes = Classe::all();
+    //         return response()->json(['classes' => $classes]);
+    //     } catch (\Throwable $th) {
+    //         //throw $th;
+    //         return response()->json(['error' => 'something went wrong!'], 500);
+    //     }
+    // }
+
     public function addUser(Request $request)
     {
         try {
@@ -91,7 +107,8 @@ class AdminController extends Controller
                 'city' => 'sometimes|string|max:25',
                 'classe' => 'sometimes|integer|exists:classes,id',
                 'is_admin' => 'required|integer|max:1',
-                'is_teacher' => 'required|integer|max:1'
+                'is_teacher' => 'required|integer|max:1',
+                'teachersclasses' => 'sometimes'
             ]);
 
             if ($validator->fails()) {
@@ -158,5 +175,10 @@ class AdminController extends Controller
             //throw $th;
             return response()->json(['error' => 'Something went wrong'], 500);
         }
+    }
+
+    public function test()
+    {
+        var_dump(date('l'));
     }
 }
